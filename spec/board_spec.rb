@@ -12,7 +12,7 @@ describe Board do
         [' ', ' ', ' ', ' ', ' ', ' ', ' '], \
         [' ', ' ', ' ', ' ', ' ', ' ', ' ']]
         actual_layout = board.initial_layout
-        expect(expected_layout).to eql(actual_layout)
+        expect(actual_layout).to eql(expected_layout)
       end
     end
   end

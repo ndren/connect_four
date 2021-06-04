@@ -48,5 +48,18 @@ describe Game do
         expect(actual_game_state).to eql(expected_game_state)
       end
     end
+    context '5x5 board' do
+      it 'declares win for X horizontally' do
+        game = Game.new(5)
+        moves = [0, 4, 1, 4, 2, 4, 3]
+        # X wins by hitting 0, 1, 2 and 3.
+        moves.each do |i|
+          game.move(i)
+        end
+        expected_game_state = 2
+        actual_game_state = game.check_game_state
+        expect(actual_game_state).to eql(expected_game_state)
+      end
+    end
   end
 end

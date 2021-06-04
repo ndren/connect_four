@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 class Board
   def initialize(size)
     @size = size
   end
+
   def initial_layout
     board = []
     column = []
@@ -14,4 +17,3 @@ class Board
     board
   end
 end
-

@@ -2,7 +2,6 @@
 
 require_relative './board'
 # Game codes...
-# -2: column is outside the board.
 # -1: column is filled.
 # 0: move finished, play on.
 # 1: draw.
@@ -17,11 +16,11 @@ class Game
   end
 
   def adjust(source, adjustment)
-    return [source[0] + adjustment[0], source[1] + adjustment[1]]
+    [source[0] + adjustment[0], source[1] + adjustment[1]]
   end
 
   def locate(address)
-    return @board.dig(address[0], address[1])
+    @board.dig(address[0], address[1])
   end
 
   def all_eql?(arr)
@@ -54,8 +53,6 @@ class Game
   end
 
   def move(column)
-    return -2 if @size < column
-
     board_by_columns = @board.transpose
     valid_location = find_last_index(board_by_columns[column])
     return -1 if valid_location == -1
@@ -63,6 +60,8 @@ class Game
     board_by_columns[column][valid_location] = @turn
     change_turn
     @board = board_by_columns.transpose
+
+    check_game_state
   end
 
   def find_last_index(column)
@@ -103,20 +102,70 @@ class Game
   end
 
   def generate_horizontals(corner)
-    return [[adjust(corner, [0, 0]), adjust(corner, [0, 1]), adjust(corner, [0, 2]), adjust(corner, [0, 3])], \
-            [adjust(corner, [1, 0]), adjust(corner, [1, 1]), adjust(corner, [1, 2]), adjust(corner, [1, 3])], \
-            [adjust(corner, [2, 0]), adjust(corner, [2, 1]), adjust(corner, [2, 2]), adjust(corner, [2, 3])], \
-            [adjust(corner, [3, 0]), adjust(corner, [3, 1]), adjust(corner, [3, 2]), adjust(corner, [3, 3])]]
+    [[adjust(corner, [0, 0]), adjust(corner, [0, 1]), adjust(corner, [0, 2]), adjust(corner, [0, 3])], \
+     [adjust(corner, [1, 0]), adjust(corner, [1, 1]), adjust(corner, [1, 2]), adjust(corner, [1, 3])], \
+     [adjust(corner, [2, 0]), adjust(corner, [2, 1]), adjust(corner, [2, 2]), adjust(corner, [2, 3])], \
+     [adjust(corner, [3, 0]), adjust(corner, [3, 1]), adjust(corner, [3, 2]), adjust(corner, [3, 3])]]
   end
 
   def generate_verticals(corner)
-    return [[adjust(corner, [0, 0]), adjust(corner, [1, 0]), adjust(corner, [2, 0]), adjust(corner, [3, 0])], \
-            [adjust(corner, [0, 1]), adjust(corner, [1, 1]), adjust(corner, [2, 1]), adjust(corner, [3, 1])], \
-            [adjust(corner, [0, 2]), adjust(corner, [1, 2]), adjust(corner, [2, 2]), adjust(corner, [3, 2])], \
-            [adjust(corner, [0, 3]), adjust(corner, [1, 3]), adjust(corner, [2, 3]), adjust(corner, [3, 3])]]
+    [[adjust(corner, [0, 0]), adjust(corner, [1, 0]), adjust(corner, [2, 0]), adjust(corner, [3, 0])], \
+     [adjust(corner, [0, 1]), adjust(corner, [1, 1]), adjust(corner, [2, 1]), adjust(corner, [3, 1])], \
+     [adjust(corner, [0, 2]), adjust(corner, [1, 2]), adjust(corner, [2, 2]), adjust(corner, [3, 2])], \
+     [adjust(corner, [0, 3]), adjust(corner, [1, 3]), adjust(corner, [2, 3]), adjust(corner, [3, 3])]]
   end
+
   def generate_diagonals(corner)
-    return [[adjust(corner, [0, 0]), adjust(corner, [1, 1]), adjust(corner, [2, 2]), adjust(corner, [3, 3])], \
-            [adjust(corner, [3, 0]), adjust(corner, [2, 1]), adjust(corner, [1, 2]), adjust(corner, [0, 3])]]
+    [[adjust(corner, [0, 0]), adjust(corner, [1, 1]), adjust(corner, [2, 2]), adjust(corner, [3, 3])], \
+     [adjust(corner, [3, 0]), adjust(corner, [2, 1]), adjust(corner, [1, 2]), adjust(corner, [0, 3])]]
   end
+
+  def print_board
+    @board.each do |line|
+      line.each do |ball|
+        print ball
+      end
+      puts
+    end
+  end
+end
+
+puts 'Welcome to Connect Four!'
+puts 'What game size to use?'
+size = 0
+size = gets.chomp.to_i until size.positive?
+game = Game.new(size)
+
+final_state = nil
+until final_state
+  puts "It is #{game.instance_variable_get(:@turn)}'s turn."
+  puts 'Make your move.'
+  move = gets.chomp.to_i
+  move -= 1
+  if (move > size - 1) || move.negative?
+    puts 'Move is outside the board.'
+    next
+  end
+  case game.move(move)
+  when -1
+    puts 'That column is filled.'
+  when 0
+    puts 'Nice move!'
+  when 1
+    final_state = 1
+  when 2
+    final_state = 2
+  when 3
+    final_state = 3
+  end
+  game.print_board
+end
+
+case final_state
+when 1
+  puts "It's a draw!"
+when 2
+  puts 'X wins!'
+when 3
+  puts 'O wins!'
 end
